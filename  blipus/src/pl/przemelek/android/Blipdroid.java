@@ -123,7 +123,13 @@ public class Blipdroid extends Activity {
         button.setOnClickListener(new OnClickListener() {
         	public void onClick(View v) {              
               String text = editor.getText().toString();
-              try {            	  
+              try {
+            	  String[] lines = text.split("\n");
+            	  text = "";
+            	  for (String str:lines) {
+            		  text+=str+" ";
+            	  }
+            	  text=text.substring(0,text.length()-1);
             	  blip.sendBlip(text);
             	  editor.setText("");
             	  refreshListOfBlips(list, blip);
