@@ -48,14 +48,14 @@ public class Blip {
 			isDirectMessage = "DirectedMessage".equals(type);
 			isPrivateMessage = "PrivateMessage".equals(type);
 			if (isStatus || isDirectMessage || isPrivateMessage) {
-			JSONObject transport = jsonObj.getJSONObject("transport");
+				JSONObject transport = jsonObj.getJSONObject("transport");
 				this.transportId = getInt(transport,"id");
 				this.transportName = getString(transport,"name");
-				if (isStatus) {
+				
 					this.picturesPath = getString(jsonObj,"pictures_path");
 					this.recordingPath = getString(jsonObj,"recording_path");
 					this.moviePath = getString(jsonObj,"movie_path");
-				} else {
+				if (!isStatus) {
 					this.recipentPath = getString(jsonObj,"recipient_path");
 				}
 			}				  	  
@@ -110,10 +110,20 @@ public class Blip {
   		  	String user = getUserPath();
   		  	user = getUserFromUserPath(user);
   		  	String toUser = "";
+  		  	String body = this.body;
   		  	if (isDirectMessage) {
   		  		toUser=">"+getUserFromUserPath(getRecipentPath());
   		  	} else if (isPrivateMessage) {
   		  		toUser=">>"+getUserFromUserPath(getRecipentPath());
+  		  	}
+  		  	if (picturesPath!=null && picturesPath.length()>0) {
+  		  		body+="\nObrazek: http://blip.pl"+picturesPath;
+  		  	}
+  		  	if (moviePath!=null && moviePath.length()>0) {
+  		  		body+="\nFilmik:  http://blip.pl"+moviePath;
+  		  	}
+  		  	if (recordingPath!=null && recordingPath.length()>0) {
+  		  		body+="\nNagranie:  http://blip.pl"+recordingPath;
   		  	}
 			return user+toUser+":"+body;
 		}
@@ -161,7 +171,6 @@ public class Blip {
 		connection.setRequestMethod("DELETE");
 		connection.setDoOutput(true);
 		connection.connect();
-//		connection.getOutputStream().write(("update[body]="+text).getBytes());
 		BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 		String line = null;
 		String str = "";
@@ -191,7 +200,6 @@ public class Blip {
 		  byte[] buffer = new byte[1024];
 		  int readCount;
 	      while((readCount=is.read(buffer))>0) {
-//	          String bufStr = new String(buffer);
 	        baos.write(buffer, 0, readCount);        
 	      }
 		  String str=new String(baos.toByteArray());		
@@ -211,7 +219,7 @@ public class Blip {
 			IOException {
 		URL url = new URL(urlStr);
 		HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-		connection.setRequestProperty("User-Agent", "Blipdroid 0.1");
+		connection.setRequestProperty("User-Agent", "Blipus 0.1");
 		connection.setRequestProperty("Authorization", credentials.getAuthorizationHeader());
 		connection.setRequestProperty("X-Blip-API","0.02");
 		connection.setRequestProperty("Accept","application/json");

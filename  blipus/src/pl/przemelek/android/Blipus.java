@@ -33,7 +33,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
-public class Blipdroid extends Activity {
+public class Blipus extends Activity {
     private static final int MENU_SETTINGS = 1;
     private static final int MENU_REFRESH = 2;
     private static final int MENU_EXIT = 3;
@@ -81,7 +81,7 @@ public class Blipdroid extends Activity {
 //        		if (convertView!=null) return convertView;
     	  	  	BlipMsg[] msges = allBlips.toArray(new BlipMsg[allBlips.size()]); 
     	  	  	BlipMsg msg = msges[(int)position]; 	  	  	
-        		TextView view = new TextView(Blipdroid.this);
+        		TextView view = new TextView(Blipus.this);
         		view.setText(msg.toString());
         		Linkify.addLinks(view, Linkify.ALL);
         		return view;
@@ -124,12 +124,7 @@ public class Blipdroid extends Activity {
         	public void onClick(View v) {              
               String text = editor.getText().toString();
               try {
-            	  String[] lines = text.split("\n");
-            	  text = "";
-            	  for (String str:lines) {
-            		  text+=str+" ";
-            	  }
-            	  text=text.substring(0,text.length()-1);
+            	  text = text.replaceAll("\n", " ").trim();
             	  blip.sendBlip(text);
             	  editor.setText("");
             	  refreshListOfBlips(list, blip);
