@@ -2,7 +2,6 @@ package pl.przemelek.android;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -21,7 +20,6 @@ import android.text.util.Linkify;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -78,9 +76,13 @@ public class Blipus extends Activity {
         	@Override
         	public View getView(int position, View convertView,
         			ViewGroup parent) {
-//        		if (convertView!=null) return convertView;
-    	  	  	BlipMsg[] msges = allBlips.toArray(new BlipMsg[allBlips.size()]); 
-    	  	  	BlipMsg msg = msges[(int)position]; 	  	  	
+    	  	  	BlipMsg[] msges = allBlips.toArray(new BlipMsg[allBlips.size()]);
+    	  	  	BlipMsg msg = msges[(int)position];
+//    	  	  	View view = findViewById(R.layout.msg_view);
+//    	  	  	TextView bodyView = (TextView)findViewById(R.id.msgBody);
+//    	  	  	bodyView.setText(msg.getMsgBody());
+//    	  	  	TextView userView = (TextView)findViewById(R.id.msgUser);
+//    	  	  	userView.setText(msg.getUsersString());    	  	  	
         		TextView view = new TextView(Blipus.this);
         		view.setText(msg.toString());
         		Linkify.addLinks(view, Linkify.ALL);
@@ -89,8 +91,13 @@ public class Blipus extends Activity {
         });        
         editor.addTextChangedListener(new TextWatcher() {
         	public void afterTextChanged(Editable s) {
-        		if (s.length()>BLIP_LIMIT) {
-        			s.delete(BLIP_LIMIT-1, s.length()-1);
+        		if (s.length()>0) {
+	        		if (s.length()>BLIP_LIMIT) {
+	        			s.delete(BLIP_LIMIT-1, s.length()-1);
+	        		}        		
+	        		if (s.toString().indexOf("\n")==s.length()-1) {
+	        			s.replace(s.length()-1, s.length(), "");
+	        		}
         		}
         	}
 
@@ -153,11 +160,9 @@ public class Blipus extends Activity {
 		        	final List<BlipMsg> blips = blip.getBlips(condition);
 		        	final List<BlipMsg> newList = new ArrayList<BlipMsg>();
 		        	if (blips.size()>0) {        		        		
-//		        		Collections.reverse(blips);
 		        		allBlips.addAll(blips);
 		        	}
 		        	newList.addAll(allBlips);
-//		        	Collections.reverse(newList);
 			        list.post(new Runnable() {
 			        	public void run() {	        			        			
 					       	ArrayAdapter<BlipMsg> s = (ArrayAdapter<BlipMsg>)list.getAdapter();
@@ -193,9 +198,9 @@ public class Blipus extends Activity {
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-    	menu.add(0, MENU_REFRESH, 0, "Refresh");
-    	menu.add(0, MENU_SETTINGS, 0, "Settings");
-    	menu.add(0, MENU_EXIT, 0, "Exit");
+    	menu.add(0, MENU_REFRESH, 0, getString(R.string.refresh));
+    	menu.add(0, MENU_SETTINGS, 0, getString(R.string.settings));
+    	menu.add(0, MENU_EXIT, 0, getString(R.string.exit));
     	return true;
     }
     
@@ -225,17 +230,17 @@ public class Blipus extends Activity {
   	  	BlipMsg[] msges = allBlips.toArray(new BlipMsg[allBlips.size()]); 
   	  	BlipMsg msg = msges[(int)((AdapterContextMenuInfo)menuInfo).id];
   	  	if (msg.isStatus() || msg.isPrivateMessage() || msg.isDirectMessage()) {
-	    	menu.setHeaderTitle("Manage your Blips");
+	    	menu.setHeaderTitle(getString(R.string.manageYourBlips));
 	    	String user = msg.getUserPath();
   		  	user = user.substring(user.lastIndexOf("/")+1);
 	    	if (currentUserName.equals(user)) {
-	    		menu.add(0,MENU_DELETE,0,"Delete");
+	    		menu.add(0,MENU_DELETE,0,getString(R.string.delete));
 	    	}
-	    	menu.add(0,MENU_QUOTE,0,"Quote");
-	    	menu.add(0,MENU_REPLY,0,"Reply");
-	    	menu.add(0,MENU_REPLY_QUOTE,0,"Reply & Quote");
-	    	menu.add(0,MENU_PRIV_REPLY,0,"Private Reply");
-	    	menu.add(0,MENU_PRIV_REPLY_QUOTE,0,"Private Reply & Quote");	    	
+	    	menu.add(0,MENU_QUOTE,0,getString(R.string.Quote));
+	    	menu.add(0,MENU_REPLY,0,getString(R.string.Reply));
+	    	menu.add(0,MENU_REPLY_QUOTE,0,getString(R.string.ReplyAndQuote));
+	    	menu.add(0,MENU_PRIV_REPLY,0,getString(R.string.PrivateReply));
+	    	menu.add(0,MENU_PRIV_REPLY_QUOTE,0,getString(R.string.PrivateReplyAndQuote));	    	
   	  	}
     }
     

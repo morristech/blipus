@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Blipuś</string>
+    <string name="refresh">Odśwież</string>
+    <string name="settings">Ustawienia</string>
+    <string name="exit">Wyjdź</string>
+    <string name="manageYourBlips">Zarządzaj Blipami</string>
+    <string name="delete">Usuń</string>
+    <string name="Quote">Cytuj</string>
+    <string name="Reply">Odpowiedz</string>
+    <string name="ReplyAndQuote">Odpowiedz i cytuj</string>
+    <string name="PrivateReply">Prywatna odpowiedź</string>
+    <string name="PrivateReplyAndQuote">Prywatna odpowiedź z cytatem</string>
+    <string name="Login">Nazwa użytkownika:</string>
+    <string name="Password">Hasło:</string>    
+    <color name="gray">#777777</color>
+</resources>

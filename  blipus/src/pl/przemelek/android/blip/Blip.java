@@ -106,26 +106,36 @@ public class Blip {
 			return moviePath;
 		}
 
+		public String getMsgBody() {
+  		  	String body = this.body;
+  		  	if (picturesPath!=null && picturesPath.length()>0) {
+  		  		body+="\nPicture: http://blip.pl"+picturesPath;
+  		  	}
+  		  	if (moviePath!=null && moviePath.length()>0) {
+  		  		body+="\nMovie:  http://blip.pl"+moviePath;
+  		  	}
+  		  	if (recordingPath!=null && recordingPath.length()>0) {
+  		  		body+="\nRecording:  http://blip.pl"+recordingPath;
+  		  	}
+  		  	return body;
+		}
+		
 		public String toString() {
-  		  	String user = getUserPath();
+  		  	String usersString = getUsersString();
+  		  	String body = getMsgBody();			
+			return usersString + ":" + body;
+		}
+		public String getUsersString() {
+			String user = getUserPath();
   		  	user = getUserFromUserPath(user);
   		  	String toUser = "";
-  		  	String body = this.body;
   		  	if (isDirectMessage) {
   		  		toUser=">"+getUserFromUserPath(getRecipentPath());
   		  	} else if (isPrivateMessage) {
   		  		toUser=">>"+getUserFromUserPath(getRecipentPath());
   		  	}
-  		  	if (picturesPath!=null && picturesPath.length()>0) {
-  		  		body+="\nObrazek: http://blip.pl"+picturesPath;
-  		  	}
-  		  	if (moviePath!=null && moviePath.length()>0) {
-  		  		body+="\nFilmik:  http://blip.pl"+moviePath;
-  		  	}
-  		  	if (recordingPath!=null && recordingPath.length()>0) {
-  		  		body+="\nNagranie:  http://blip.pl"+recordingPath;
-  		  	}
-			return user+toUser+":"+body;
+  		  	String usersString = user+toUser;
+			return usersString;
 		}
 		private String getUserFromUserPath(String user) {
 			user = user.substring(user.lastIndexOf("/")+1);
