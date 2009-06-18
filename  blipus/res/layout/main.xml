@@ -4,7 +4,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-
+<TextView android:textSize="10px" android:background="@android:color/black" android:layout_height="wrap_content" android:lines="1" android:id="@+id/textSize" android:text="0/160" android:textColor="#AAA" android:gravity="right" android:layout_width="fill_parent"/>
 <EditText android:layout_height="wrap_content" android:layout_width="fill_parent" android:lines="3" android:id="@+id/Edit01"></EditText>
 <Button android:id="@+id/Button01" android:layout_height="wrap_content" android:text="Blip" android:layout_width="fill_parent"></Button>
 <ListView android:id="@+id/list" android:layout_width="wrap_content" android:layout_height="wrap_content"></ListView>

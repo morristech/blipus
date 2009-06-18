@@ -70,6 +70,7 @@ public class Blipus extends Activity {
         currentUserName = userName;
         Button button = (Button)findViewById(R.id.Button01);
         final EditText editor = (EditText)findViewById(R.id.Edit01);
+        final TextView textLengthInfo = (TextView)findViewById(R.id.textSize);
         list = (ListView)findViewById(R.id.list);
         list.setAdapter(new ArrayAdapter<BlipMsg>(this,
                          android.R.layout.simple_list_item_1) {
@@ -91,14 +92,21 @@ public class Blipus extends Activity {
         });        
         editor.addTextChangedListener(new TextWatcher() {
         	public void afterTextChanged(Editable s) {
-        		if (s.length()>0) {
-	        		if (s.length()>BLIP_LIMIT) {
-	        			s.delete(BLIP_LIMIT-1, s.length()-1);
+        		int len = s.length();
+        		if (len>0) {
+	        		if (len>BLIP_LIMIT) {
+	        			s.delete(BLIP_LIMIT-1, len-1);
 	        		}        		
-	        		if (s.toString().indexOf("\n")==s.length()-1) {
-	        			s.replace(s.length()-1, s.length(), "");
+	        		if (s.toString().indexOf("\n")==len-1) {
+	        			s.replace(len-1,len, "");
 	        		}
         		}
+        		final String textLength = ""+len+"/"+(160-len);
+        		textLengthInfo.post(new Runnable() {
+        			public void run() {
+        				textLengthInfo.setText(textLength);
+        			}
+        		});
         	}
 
 			public void beforeTextChanged(CharSequence s, int start, int count,

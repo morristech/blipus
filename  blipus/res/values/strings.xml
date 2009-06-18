@@ -13,5 +13,6 @@
     <string name="PrivateReplyAndQuote">Private Reply &amp; Quote</string>
     <string name="Login">Login:</string>
     <string name="Password">Password:</string>
+    <string name="Store">Store</string>
     <color name="gray">#777777</color>
 </resources>
