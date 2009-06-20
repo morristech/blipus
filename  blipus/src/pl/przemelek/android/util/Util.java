@@ -3,7 +3,7 @@ package pl.przemelek.android.util;
 public class Util {
 	private static String charSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 	 
-	public static String encodeToBase64(String text) {
+	public static String encodeToBase64(String text) {	
 		int[] encoded = new int[text.length()*8/6+4];
 		int trueLen = text.length()*8/6+1;
 		int newLen = 0;

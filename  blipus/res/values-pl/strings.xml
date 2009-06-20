@@ -13,6 +13,7 @@
     <string name="PrivateReplyAndQuote">Prywatna odpowiedź z cytatem</string>
     <string name="Login">Nazwa użytkownika:</string>
     <string name="Password">Hasło:</string>
-    <string name="Store">Zapisz</string>    
+    <string name="Store">Zapisz</string>
+    <string name="Cancel">Anuluj</string>
     <color name="gray">#777777</color>
 </resources>

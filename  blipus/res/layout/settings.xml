@@ -8,5 +8,19 @@
 <EditText android:id="@+id/loginTextField" android:layout_height="wrap_content" android:layout_width="fill_parent"></EditText>
 <TextView android:id="@+id/TextView02" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/Password"></TextView>
 <EditText android:id="@+id/passwordTextField" android:layout_height="wrap_content" android:layout_width="fill_parent" android:password="true"></EditText>
-<Button android:id="@+id/storeButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/Store"></Button>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+<Button android:id="@+id/cancelButton" android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/passwordTextField"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="10dip"
+	    android:text="@string/Cancel"></Button>
+<Button android:id="@+id/storeButton"  android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/cancelButton"
+        android:layout_alignTop="@id/cancelButton"
+        android:text="@string/Store" ></Button>
+</RelativeLayout>
 </LinearLayout>

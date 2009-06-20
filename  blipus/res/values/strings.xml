@@ -14,5 +14,6 @@
     <string name="Login">Login:</string>
     <string name="Password">Password:</string>
     <string name="Store">Store</string>
+    <string name="Cancel">Cancel</string>
     <color name="gray">#777777</color>
 </resources>

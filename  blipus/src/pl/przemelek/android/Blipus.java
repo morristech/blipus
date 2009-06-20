@@ -16,7 +16,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.text.util.Linkify;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -79,14 +78,7 @@ public class Blipus extends Activity {
         			ViewGroup parent) {
     	  	  	BlipMsg[] msges = allBlips.toArray(new BlipMsg[allBlips.size()]);
     	  	  	BlipMsg msg = msges[(int)position];
-//    	  	  	View view = findViewById(R.layout.msg_view);
-//    	  	  	TextView bodyView = (TextView)findViewById(R.id.msgBody);
-//    	  	  	bodyView.setText(msg.getMsgBody());
-//    	  	  	TextView userView = (TextView)findViewById(R.id.msgUser);
-//    	  	  	userView.setText(msg.getUsersString());    	  	  	
-        		TextView view = new TextView(Blipus.this);
-        		view.setText(msg.toString());
-        		Linkify.addLinks(view, Linkify.ALL);
+    	  	  	MsgView view = new MsgView(Blipus.this, msg.getUsersString()+" "+msg.getCreatedAt(), msg.getBody());
         		return view;
         	}
         });        
@@ -110,16 +102,10 @@ public class Blipus extends Activity {
         	}
 
 			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-				// TODO Auto-generated method stub
-				
-			}
+					int after) { }
 
 			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
-				// TODO Auto-generated method stub
-				
-			}
+					int count) { }
         });
         blip = new Blip(new Credentials(getSharedPreferences("CREDENTIALS", Context.MODE_PRIVATE)));
         new Thread(new Runnable() {
@@ -158,7 +144,7 @@ public class Blipus extends Activity {
 		if (duringRefresh) return;
 		new Thread(new Runnable() {
 			public void run() {
-				if (duringRefresh) return;
+				if (duringRefresh) return;      	  
 				duringRefresh = true;
 				try {
 					String condition = null;
@@ -194,8 +180,16 @@ public class Blipus extends Activity {
 			        		list.invalidate();			        		
 			        	}
 			        });			        
-		        } catch (Exception e) {
+		        } catch (final Exception e) {		        	
 		        	e.printStackTrace();
+		        	Blipus.this.runOnUiThread(new Runnable() {
+		        		public void run() {
+		        			Dialog d = new Dialog(Blipus.this);		        			
+			            	d.setTitle(e.getLocalizedMessage());
+			            	d.show();
+		        		}
+		        	});
+	            	  
 		        } finally {
 		        	duringRefresh=false;
 		        }

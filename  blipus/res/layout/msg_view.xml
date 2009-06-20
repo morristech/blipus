@@ -4,6 +4,16 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-<TextView android:id="@+id/msgUser" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="user"></TextView>    
-<TextView android:id="@+id/msgBody" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="blipView" android:autoLink="all"></TextView>
+<TextView android:id="@+id/msgUser" 
+	android:layout_height="wrap_content" 
+	android:text="user"
+	android:textColor="@android:color/black"
+	android:background="@android:color/darker_gray"
+	android:layout_width="fill_parent" />    
+<TextView android:id="@+id/msgBody" 
+	android:text="blipView" 
+	android:textColor="@android:color/black"
+	android:background="@android:color/white"
+	android:layout_width="fill_parent" 
+	android:layout_height="wrap_content"/>
 </LinearLayout>

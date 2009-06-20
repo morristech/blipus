@@ -12,7 +12,7 @@
             </intent-filter>            
         </activity>
     <activity android:name=".SettingsActivity">
-</activity>
+	</activity>
 <receiver android:name="NewPhotoReceiver">
         <intent-filter>
                 <action android:name="com.android.camera.NEW_PICTURE"/>
