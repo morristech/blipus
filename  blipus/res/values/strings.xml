@@ -16,4 +16,6 @@
     <string name="Store">Store</string>
     <string name="Cancel">Cancel</string>
     <color name="gray">#777777</color>
+    <color name="blue">#7788AA</color>
+    <color name="blue2">#4455AA</color>
 </resources>

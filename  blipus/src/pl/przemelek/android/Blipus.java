@@ -59,7 +59,8 @@ public class Blipus extends Activity {
 
     @Override
     protected void onResume() {
-    	super.onResume();    	
+    	super.onResume();
+//    	Log.i
         SharedPreferences prefs = getSharedPreferences("CREDENTIALS", Context.MODE_PRIVATE);
         String userName = prefs.getString("userName", null);
         
@@ -78,7 +79,7 @@ public class Blipus extends Activity {
         			ViewGroup parent) {
     	  	  	BlipMsg[] msges = allBlips.toArray(new BlipMsg[allBlips.size()]);
     	  	  	BlipMsg msg = msges[(int)position];
-    	  	  	MsgView view = new MsgView(Blipus.this, msg.getUsersString()+" "+msg.getCreatedAt(), msg.getBody());
+    	  	  	MsgView view = new MsgView(Blipus.this, msg.getUsersString()+" "+msg.getCreatedAt(), msg.getBody());    	  	  	
         		return view;
         	}
         });        
@@ -113,7 +114,7 @@ public class Blipus extends Activity {
         		while (1==1) {
 	        		refreshListOfBlips(list, blip);
 	        		try {
-	        			Thread.sleep(30*1000);
+	        			Thread.sleep(15*1000);
 	        		} catch (InterruptedException ie) {
 	        			        	
         		}
@@ -153,33 +154,39 @@ public class Blipus extends Activity {
 					}
 		        	final List<BlipMsg> blips = blip.getBlips(condition);
 		        	final List<BlipMsg> newList = new ArrayList<BlipMsg>();
-		        	if (blips.size()>0) {        		        		
+		        	boolean redraw = false;
+		        	if (blips.size()>0) {
+		        		blips.addAll(allBlips);
+		        		allBlips.clear();
 		        		allBlips.addAll(blips);
+		        		redraw = true;
 		        	}
 		        	newList.addAll(allBlips);
-			        list.post(new Runnable() {
-			        	public void run() {	        			        			
-					       	ArrayAdapter<BlipMsg> s = (ArrayAdapter<BlipMsg>)list.getAdapter();
-					       	s.clear();
-					       	for (BlipMsg blipMsg:newList) {
-					       		s.add(blipMsg);
-					       		if (blipMsg.getId()>lastId) {
-					       			lastId = blipMsg.getId();
-					       		}
-					       	}
-			        	}
-			        });			        
+		        	if (redraw) {
+				        list.post(new Runnable() {
+				        	public void run() {	        			        			
+						       	ArrayAdapter<BlipMsg> s = (ArrayAdapter<BlipMsg>)list.getAdapter();
+						       	s.clear();
+						       	for (BlipMsg blipMsg:newList) {
+						       		s.add(blipMsg);
+						       		if (blipMsg.getId()>lastId) {
+						       			lastId = blipMsg.getId();
+						       		}
+						       	}
+				        	}
+				        });
+		        	}
 //			        NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);			        
 //			        Notification notification = new Notification(R.drawable.icon,"New blips!!!",System.currentTimeMillis());
 //			        notification.flags=Notification.FLAG_SHOW_LIGHTS;
 //			        notification.ledOffMS=100;
 //			        notification.ledOnMS=250;
 //			        nm.notify((int)System.currentTimeMillis(), notification);
-			        list.post(new Runnable() {
-			        	public void run() {
-			        		list.invalidate();			        		
-			        	}
-			        });			        
+//			        list.post(new Runnable() {
+//			        	public void run() {
+//			        		list.invalidate();			        		
+//			        	}
+//			        });			        
 		        } catch (final Exception e) {		        	
 		        	e.printStackTrace();
 		        	Blipus.this.runOnUiThread(new Runnable() {
@@ -257,6 +264,7 @@ public class Blipus extends Activity {
 	    	  case MENU_DELETE: {
 	    		  try {
 	    			  blip.deleteBlip(""+msg.getId());
+	    			  allBlips.remove(msg);
 	    			  ArrayAdapter<BlipMsg> s = (ArrayAdapter<BlipMsg>)list.getAdapter();
 	    			  s.remove(msg);
 	    			  refreshListOfBlips(list, blip);
