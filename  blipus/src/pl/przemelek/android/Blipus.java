@@ -21,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
@@ -53,6 +54,7 @@ public class Blipus extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.main);
                 
     }
@@ -61,6 +63,7 @@ public class Blipus extends Activity {
     protected void onResume() {
     	super.onResume();
 //    	Log.i
+//    	requestWindowFeature(Window.FEATURE_NO_TITLE);
         SharedPreferences prefs = getSharedPreferences("CREDENTIALS", Context.MODE_PRIVATE);
         String userName = prefs.getString("userName", null);
         
@@ -79,7 +82,19 @@ public class Blipus extends Activity {
         			ViewGroup parent) {
     	  	  	BlipMsg[] msges = allBlips.toArray(new BlipMsg[allBlips.size()]);
     	  	  	BlipMsg msg = msges[(int)position];
-    	  	  	MsgView view = new MsgView(Blipus.this, msg.getUsersString()+" "+msg.getCreatedAt(), msg.getBody());    	  	  	
+    	  	  	MsgView view = new MsgView(Blipus.this, msg.getUsersString()+" "+msg.getCreatedAt(), msg.getBody());
+//    	  	  	findViewById(R.id.image).setVisibility(View.INVISIBLE);
+//    	  	  	findViewById(R.id.movie).setVisibility(View.INVISIBLE);
+//    	  	  	findViewById(R.id.recording).setVisibility(View.INVISIBLE);
+//    	  	  	if (msg.hasPicture()) {
+//    	  	  		findViewById(R.id.image).setVisibility(View.VISIBLE);
+//    	  	  	}
+//    	  	  	if (msg.hasMovie()) {
+//    	  	  		findViewById(R.id.movie).setVisibility(View.VISIBLE);
+//    	  	  	}
+//    	  	  	if (msg.hasRecording()) {
+//    	  	  		findViewById(R.id.recording).setVisibility(View.VISIBLE);
+//    	  	  	}    	  	  	
         		return view;
         	}
         });        
@@ -136,9 +151,7 @@ public class Blipus extends Activity {
             	  d.show();
               }
         	}
-
-        });
-
+        });        
     }
     
 	private void refreshListOfBlips(final ListView list,final Blip blip) {
@@ -189,13 +202,13 @@ public class Blipus extends Activity {
 //			        });			        
 		        } catch (final Exception e) {		        	
 		        	e.printStackTrace();
-		        	Blipus.this.runOnUiThread(new Runnable() {
-		        		public void run() {
-		        			Dialog d = new Dialog(Blipus.this);		        			
-			            	d.setTitle(e.getLocalizedMessage());
-			            	d.show();
-		        		}
-		        	});
+//		        	Blipus.this.runOnUiThread(new Runnable() {
+//		        		public void run() {
+//		        			Dialog d = new Dialog(Blipus.this);		        			
+//			            	d.setTitle(e.getLocalizedMessage());
+//			            	d.show();
+//		        		}
+//		        	});
 	            	  
 		        } finally {
 		        	duringRefresh=false;

@@ -15,8 +15,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.os.PatternMatcher;
-
 public class Blip {
 	
 	public static class BlipMsg {
@@ -34,6 +32,9 @@ public class Blip {
 		private boolean isStatus;
 		private boolean isDirectMessage;
 		private boolean isPrivateMessage;
+		private boolean withPicture;
+		private boolean withMovie;
+		private boolean withRecording;
 		public BlipMsg(String json) throws JSONException {
 			this(new JSONObject(json));
 		}
@@ -52,9 +53,18 @@ public class Blip {
 				this.transportId = getInt(transport,"id");
 				this.transportName = getString(transport,"name");
 				
-					this.picturesPath = getString(jsonObj,"pictures_path");
-					this.recordingPath = getString(jsonObj,"recording_path");
-					this.moviePath = getString(jsonObj,"movie_path");
+				this.picturesPath = getString(jsonObj,"pictures_path");
+				this.recordingPath = getString(jsonObj,"recording_path");
+				this.moviePath = getString(jsonObj,"movie_path");
+				if (!"".equals(picturesPath)) {
+					withPicture=true;
+				}
+				if (!"".equals(moviePath)) {
+					withMovie=true;
+				}
+				if (!"".equals(recordingPath)) {
+					withRecording=true;
+				}					
 				if (!isStatus) {
 					this.recipentPath = getString(jsonObj,"recipient_path");
 				}
@@ -108,23 +118,9 @@ public class Blip {
 
 		public String getMsgBody() {
   		  	String body = this.body;
-  		  	if (picturesPath!=null && picturesPath.length()>0) {
-  		  		body+="\nPicture: http://blip.pl"+picturesPath;
-  		  	}
-  		  	if (moviePath!=null && moviePath.length()>0) {
-  		  		body+="\nMovie:  http://blip.pl"+moviePath;
-  		  	}
-  		  	if (recordingPath!=null && recordingPath.length()>0) {
-  		  		body+="\nRecording:  http://blip.pl"+recordingPath;
-  		  	}
   		  	return body;
 		}
-		
-		public String toString() {
-  		  	String usersString = getUsersString();
-  		  	String body = getMsgBody();			
-			return usersString + ":" + body;
-		}
+
 		public String getUsersString() {
 			String user = getUserPath();
   		  	user = getUserFromUserPath(user);
@@ -153,6 +149,15 @@ public class Blip {
 		public boolean isPrivateMessage() {
 			return isPrivateMessage;
 		}
+		public boolean hasPicture() {
+			return withPicture;
+		}
+		public boolean hasMovie() {
+			return withMovie;
+		}
+		public boolean hasRecording() {
+			return withRecording;
+		}		
 	}
 	private Credentials credentials;
 	
@@ -163,9 +168,11 @@ public class Blip {
 	public String sendBlip(String text) throws IOException {		
 		HttpURLConnection connection = getConnection("http://api.blip.pl/updates");
 		connection.setRequestMethod("POST");
+		byte[] bytes = ("update[body]="+text).getBytes();
+		connection.setRequestProperty("Content-Length", ""+bytes.length);
 		connection.setDoOutput(true);
-		connection.connect();
-		connection.getOutputStream().write(("update[body]="+text).getBytes());
+		connection.connect();		
+		connection.getOutputStream().write(bytes);
 		BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 		String line = null;
 		String str = "";
@@ -175,7 +182,7 @@ public class Blip {
 		br.close();
 		return str;
 	}
-
+	
 	public String deleteBlip(String id) throws IOException {		
 		HttpURLConnection connection = getConnection("http://api.blip.pl/updates/"+id);
 		connection.setRequestMethod("DELETE");
