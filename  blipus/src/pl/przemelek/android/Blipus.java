@@ -8,6 +8,7 @@ import java.util.List;
 import pl.przemelek.android.blip.Blip;
 import pl.przemelek.android.blip.Credentials;
 import pl.przemelek.android.blip.Blip.BlipMsg;
+import pl.przemelek.android.db.StatusesManager;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -50,6 +51,7 @@ public class Blipus extends Activity {
 	private LinkedHashSet<BlipMsg> allBlips = new LinkedHashSet<BlipMsg>();
 	private ListView list;
 	private Blip blip;
+	private StatusesManager manager;
 	/** Called when the activity is first created. */ 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,7 +62,7 @@ public class Blipus extends Activity {
     }
 
     @Override
-    protected void onResume() {
+    protected void onResume() {    	
     	super.onResume();
 //    	Log.i
 //    	requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -69,7 +71,9 @@ public class Blipus extends Activity {
         
         if (userName==null) {
         	startActivity(new Intent(this,SettingsActivity.class));
-        }
+        } else {
+        	startService(new Intent(this,BlipusService.class));
+        }        
         currentUserName = userName;
         Button button = (Button)findViewById(R.id.Button01);
         final EditText editor = (EditText)findViewById(R.id.Edit01);
@@ -124,10 +128,11 @@ public class Blipus extends Activity {
 					int count) { }
         });
         blip = new Blip(new Credentials(getSharedPreferences("CREDENTIALS", Context.MODE_PRIVATE)));
+        manager = new StatusesManager(this);
         new Thread(new Runnable() {
         	public void run() {
         		while (1==1) {
-	        		refreshListOfBlips(list, blip);
+	        		refreshListOfBlips(list);
 	        		try {
 	        			Thread.sleep(15*1000);
 	        		} catch (InterruptedException ie) {
@@ -144,7 +149,7 @@ public class Blipus extends Activity {
             	  text = text.replaceAll("\n", " ").trim();
             	  blip.sendBlip(text);
             	  editor.setText("");
-            	  refreshListOfBlips(list, blip);
+            	  refreshListOfBlips(list);
               } catch (Exception e) {              
             	  Dialog d = new Dialog(editor.getContext());
             	  d.setTitle(e.getLocalizedMessage());
@@ -154,18 +159,18 @@ public class Blipus extends Activity {
         });        
     }
     
-	private void refreshListOfBlips(final ListView list,final Blip blip) {
+	private void refreshListOfBlips(final ListView list) {
 		if (duringRefresh) return;
 		new Thread(new Runnable() {
 			public void run() {
-				if (duringRefresh) return;      	  
+				if (duringRefresh) return;
 				duringRefresh = true;
 				try {
 					String condition = null;
 					if (lastId!=-1) {
-						condition = ""+lastId;
+						condition = "id>"+lastId;
 					}
-		        	final List<BlipMsg> blips = blip.getBlips(condition);
+		        	final List<BlipMsg> blips = manager.getList(condition, "100",false); 
 		        	final List<BlipMsg> newList = new ArrayList<BlipMsg>();
 		        	boolean redraw = false;
 		        	if (blips.size()>0) {
@@ -234,7 +239,7 @@ public class Blipus extends Activity {
     			return true;
     		}
     		case MENU_REFRESH : {
-    			refreshListOfBlips(list, blip);
+    			refreshListOfBlips(list);
     			return true;
     		}
     		case MENU_EXIT : {
@@ -277,10 +282,11 @@ public class Blipus extends Activity {
 	    	  case MENU_DELETE: {
 	    		  try {
 	    			  blip.deleteBlip(""+msg.getId());
+	    			  manager.delete(msg.getId());
 	    			  allBlips.remove(msg);
 	    			  ArrayAdapter<BlipMsg> s = (ArrayAdapter<BlipMsg>)list.getAdapter();
 	    			  s.remove(msg);
-	    			  refreshListOfBlips(list, blip);
+	    			  refreshListOfBlips(list);
 	    		  } catch (IOException ioEx) {
 	    			  
 	    		  }	    		  

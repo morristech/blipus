@@ -35,10 +35,12 @@ public class Blip {
 		private boolean withPicture;
 		private boolean withMovie;
 		private boolean withRecording;
+		private String json;
 		public BlipMsg(String json) throws JSONException {
-			this(new JSONObject(json));
+			this(new JSONObject(json));			
 		}
 		public BlipMsg(JSONObject jsonObj) throws JSONException {
+			json = jsonObj.toString();
 			this.type = getString(jsonObj,"type");
 			this.id = getInt(jsonObj,"id");
 			this.body = getString(jsonObj,"body");			
@@ -157,7 +159,10 @@ public class Blip {
 		}
 		public boolean hasRecording() {
 			return withRecording;
-		}		
+		}
+		public String toJSONString() {
+			return this.json;
+		}
 	}
 	private Credentials credentials;
 	
