@@ -11,6 +11,8 @@ import pl.przemelek.android.blip.Blip.BlipMsg;
 import pl.przemelek.android.db.StatusesManager;
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.NotificationManager;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -64,6 +66,7 @@ public class Blipus extends Activity {
     @Override
     protected void onResume() {    	
     	super.onResume();
+    	((NotificationManager)getSystemService(NOTIFICATION_SERVICE)).cancel(1);
 //    	Log.i
 //    	requestWindowFeature(Window.FEATURE_NO_TITLE);
         SharedPreferences prefs = getSharedPreferences("CREDENTIALS", Context.MODE_PRIVATE);
@@ -72,7 +75,7 @@ public class Blipus extends Activity {
         if (userName==null) {
         	startActivity(new Intent(this,SettingsActivity.class));
         } else {
-        	startService(new Intent(this,BlipusService.class));
+        	startService(new Intent(this,BlipusService.class));        	
         }        
         currentUserName = userName;
         Button button = (Button)findViewById(R.id.Button01);

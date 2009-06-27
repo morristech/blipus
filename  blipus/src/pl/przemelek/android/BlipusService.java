@@ -9,10 +9,14 @@ import pl.przemelek.android.blip.Blip;
 import pl.przemelek.android.blip.Credentials;
 import pl.przemelek.android.blip.Blip.BlipMsg;
 import pl.przemelek.android.db.StatusesManager;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -28,9 +32,13 @@ public class BlipusService extends Service {
 		if (blip==null) {
 			blip = new Blip(new Credentials(getSharedPreferences("CREDENTIALS", Context.MODE_PRIVATE)));
 		}
+		Log.i("BlipusService", "Will cancel old timer");
 		updateTimer.cancel();
+		Log.i("BlipusService", "old timer canceled");
 		updateTimer = new Timer("blipusTimer");
+		Log.i("BlipusService", "new timer created");
 		updateTimer.scheduleAtFixedRate(doRefresh, 0, 10*1000);
+		Log.i("BlipusService", "new timer scheduled");
 	}
 	
 	private TimerTask doRefresh = new TimerTask() {
@@ -42,6 +50,7 @@ public class BlipusService extends Service {
 	@Override
 	public void onCreate() {
 		updateTimer = new Timer("blipusTimer");
+		Log.i("BlipusService", "new timer created in onCreate");
 	}
 	
 	private void refreshListOfBlips() {
@@ -62,29 +71,27 @@ public class BlipusService extends Service {
 		        	if (blips.size()>0) {
 		        		for (BlipMsg msg:blips) {
 		        			manager.create(msg);
-		        		}
+		        		}		        	
+				        NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);			        
+				        Notification notification = new Notification(R.drawable.icon,"New blips!!!",System.currentTimeMillis());
+	//			        notification.flags=Notification.FLAG_SHOW_LIGHTS;
+	//			        notification.ledOffMS=100;
+	//			        notification.ledOnMS=250;
+				        
+				        Context context = getApplicationContext();
+				        String expandedText = "You have "+blips.size()+" new blips";
+				        String expandedTitle = "New Blips are here! :-)";
+				        Intent intent = new Intent(context, Blipus.class);
+				        PendingIntent launchIntent = PendingIntent.getActivity(context, 0, intent, 0);
+				        notification.setLatestEventInfo(context,
+				    		 expandedTitle,
+				    		 expandedText,
+				    		 launchIntent);
+				        
+				        nm.notify(1, notification);
 		        	}
-//			        NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);			        
-//			        Notification notification = new Notification(R.drawable.icon,"New blips!!!",System.currentTimeMillis());
-//			        notification.flags=Notification.FLAG_SHOW_LIGHTS;
-//			        notification.ledOffMS=100;
-//			        notification.ledOnMS=250;
-//			        nm.notify((int)System.currentTimeMillis(), notification);
-//			        list.post(new Runnable() {
-//			        	public void run() {
-//			        		list.invalidate();			        		
-//			        	}
-//			        });			        
 		        } catch (final Exception e) {		        	
-		        	e.printStackTrace();
-//		        	Blipus.this.runOnUiThread(new Runnable() {
-//		        		public void run() {
-//		        			Dialog d = new Dialog(Blipus.this);		        			
-//			            	d.setTitle(e.getLocalizedMessage());
-//			            	d.show();
-//		        		}
-//		        	});
-	            	  
+		        	e.printStackTrace();	            	  
 		        } finally {
 		        	duringRefresh=false;
 		        }		        
