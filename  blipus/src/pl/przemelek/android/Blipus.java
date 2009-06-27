@@ -280,16 +280,14 @@ public class Blipus extends Activity {
     	  try {
     	  switch (item.getItemId()) {
 	    	  case MENU_DELETE: {
-	    		  try {
-	    			  blip.deleteBlip(""+msg.getId());
-	    			  manager.delete(msg.getId());
-	    			  allBlips.remove(msg);
-	    			  ArrayAdapter<BlipMsg> s = (ArrayAdapter<BlipMsg>)list.getAdapter();
-	    			  s.remove(msg);
-	    			  refreshListOfBlips(list);
-	    		  } catch (IOException ioEx) {
-	    			  
-	    		  }	    		  
+    			  try {
+    				  blip.deleteBlip(""+msg.getId());
+    			  } catch (IOException ex) { }
+    			  manager.delete(msg);
+    			  allBlips.remove(msg);
+    			  ArrayAdapter<BlipMsg> s = (ArrayAdapter<BlipMsg>)list.getAdapter();
+    			  s.remove(msg);
+    			  refreshListOfBlips(list); 
 	    		  return true;
 	    	  }
 	    	  case MENU_QUOTE: {	    		 	    		 

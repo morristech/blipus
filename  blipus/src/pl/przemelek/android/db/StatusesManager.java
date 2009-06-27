@@ -55,12 +55,13 @@ public class StatusesManager {
 		if (cursor.moveToFirst()) {
 			try {
 				String body = cursor.getString(3);
-				msg = new BlipMsg(body);
+				msg = new BlipMsg(cursor.getInt(0), body);
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
+		cursor.deactivate();
 		return msg;
 	}
 	
@@ -85,7 +86,7 @@ public class StatusesManager {
 				BlipMsg msg = null;
 				try {
 					String body = cursor.getString(3);
-					msg = new BlipMsg(body);
+					msg = new BlipMsg(cursor.getInt(0),body);
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -101,6 +102,7 @@ public class StatusesManager {
 				}				
 			} while (hasNext);
 		}
+		cursor.deactivate();
 		return list;
 	}
 	
@@ -111,6 +113,10 @@ public class StatusesManager {
 	}
 	
 	public void delete(int idx) {
-		// myDatabase.delete(DATABASE_TABLE, KEY_ID + “=” + rowId, null);
+		 myDatabase.delete(DATABASE_TABLE, "_id=" + idx, null);
+	}
+	
+	public void delete(BlipMsg msg) {
+		delete(msg.getDbId());
 	}
 }

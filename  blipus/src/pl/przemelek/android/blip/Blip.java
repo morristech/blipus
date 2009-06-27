@@ -35,18 +35,19 @@ public class Blip {
 		private boolean withPicture;
 		private boolean withMovie;
 		private boolean withRecording;
+		private int dbId;
 		private String json;
-		public BlipMsg(String json) throws JSONException {
-			this(new JSONObject(json));			
+		public BlipMsg(int dbId, String json) throws JSONException {
+			this(dbId, new JSONObject(json));			
 		}
-		public BlipMsg(JSONObject jsonObj) throws JSONException {
+		public BlipMsg(int dbId, JSONObject jsonObj) throws JSONException {
 			json = jsonObj.toString();
 			this.type = getString(jsonObj,"type");
 			this.id = getInt(jsonObj,"id");
 			this.body = getString(jsonObj,"body");			
 			this.createdAt = getString(jsonObj,"created_at");
 			this.userPath = getString(jsonObj,"user_path");
-			
+			this.dbId = dbId;
 			isStatus = "Status".equals(type);
 			isDirectMessage = "DirectedMessage".equals(type);
 			isPrivateMessage = "PrivateMessage".equals(type);
@@ -163,6 +164,9 @@ public class Blip {
 		public String toJSONString() {
 			return this.json;
 		}
+		public int getDbId() {
+			return dbId;
+		}
 	}
 	private Credentials credentials;
 	
@@ -228,7 +232,7 @@ public class Blip {
 		  try {
 			JSONArray jsonArray = new JSONArray(str);
 			for (int idx=0; idx<jsonArray.length(); idx++) {
-				BlipMsg blipMsg = new BlipMsg(jsonArray.getJSONObject(idx));
+				BlipMsg blipMsg = new BlipMsg(-1,jsonArray.getJSONObject(idx));
 				blips.add(blipMsg);
 			}
 		} catch (JSONException jsonEx) {
@@ -241,7 +245,7 @@ public class Blip {
 			IOException {
 		URL url = new URL(urlStr);
 		HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-		connection.setRequestProperty("User-Agent", "Blipus 0.1");
+		connection.setRequestProperty("User-Agent", "Blipus 0.3");
 		connection.setRequestProperty("Authorization", credentials.getAuthorizationHeader());
 		connection.setRequestProperty("X-Blip-API","0.02");
 		connection.setRequestProperty("Accept","application/json");
