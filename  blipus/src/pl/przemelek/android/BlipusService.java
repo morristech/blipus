@@ -17,8 +17,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
 public class BlipusService extends Service {
 	private Timer updateTimer;
@@ -33,19 +31,17 @@ public class BlipusService extends Service {
 			blip = new Blip(new Credentials(getSharedPreferences("CREDENTIALS", Context.MODE_PRIVATE)));
 		}
 		Log.i("BlipusService", "Will cancel old timer");
+		updateTimer.purge();
 		updateTimer.cancel();
-		Log.i("BlipusService", "old timer canceled");
 		updateTimer = new Timer("blipusTimer");
-		Log.i("BlipusService", "new timer created");
+		TimerTask doRefresh = new TimerTask() {
+			public void run() {
+				refreshListOfBlips();
+			}
+		};		
 		updateTimer.scheduleAtFixedRate(doRefresh, 0, 10*1000);
-		Log.i("BlipusService", "new timer scheduled");
 	}
 	
-	private TimerTask doRefresh = new TimerTask() {
-		public void run() {
-			refreshListOfBlips();
-		}
-	};
 	
 	@Override
 	public void onCreate() {

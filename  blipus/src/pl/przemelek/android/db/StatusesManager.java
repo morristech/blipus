@@ -30,14 +30,15 @@ public class StatusesManager {
 		createDatabase();
 	}
 	
-	private void createDatabase() {
-	  
+	private void createDatabase() {	  
 	  myDatabase = context.openOrCreateDatabase(DATABASE_NAME, 
 	                                    Context.MODE_PRIVATE, null);
-	  try {
-		  myDatabase.execSQL(DATABASE_CREATE);
-	  } catch (Exception e) {
-		  e.printStackTrace();
+	  if (context.databaseList().length==0) {
+		  try {
+			  myDatabase.execSQL(DATABASE_CREATE);
+		  } catch (Exception e) {
+			  e.printStackTrace();
+		  }
 	  }
 	}
 	

@@ -134,6 +134,8 @@ public class Blipus extends Activity {
         manager = new StatusesManager(this);
         new Thread(new Runnable() {
         	public void run() {
+        		duringRefresh = false;
+        		lastId=0;
         		while (1==1) {
 	        		refreshListOfBlips(list);
 	        		try {
@@ -246,6 +248,7 @@ public class Blipus extends Activity {
     			return true;
     		}
     		case MENU_EXIT : {
+    			stopService(new Intent(this,BlipusService.class));
     			finish();
     			return true;
     		}
@@ -278,19 +281,28 @@ public class Blipus extends Activity {
     public boolean onContextItemSelected(MenuItem item) {
     	  AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
     	  BlipMsg[] msges = allBlips.toArray(new BlipMsg[allBlips.size()]); 
-    	  BlipMsg msg = msges[(int)info.id];
+    	  final BlipMsg msg = msges[(int)info.id];
     	  final EditText editor = (EditText)findViewById(R.id.Edit01);
     	  try {
     	  switch (item.getItemId()) {
 	    	  case MENU_DELETE: {
-    			  try {
-    				  blip.deleteBlip(""+msg.getId());
-    			  } catch (IOException ex) { }
-    			  manager.delete(msg);
-    			  allBlips.remove(msg);
-    			  ArrayAdapter<BlipMsg> s = (ArrayAdapter<BlipMsg>)list.getAdapter();
-    			  s.remove(msg);
-    			  refreshListOfBlips(list); 
+	    		  new Thread(new Runnable() {
+	    			  public void run() {
+		    			  try {
+		    				  blip.deleteBlip(""+msg.getId());
+		    			  } catch (IOException ex) { }
+		    			  manager.delete(msg);
+		    			  allBlips.remove(msg);
+		    			  list.post(new Runnable() {
+		    				 public void run() {
+				    			  ArrayAdapter<BlipMsg> s = (ArrayAdapter<BlipMsg>)list.getAdapter();
+				    			  s.remove(msg);
+				    			  refreshListOfBlips(list);
+				    			  bindService(new Intent("pl.przemelek.android.BlipusService.START"), null, 0);
+		    				 }		    				 
+		    			  });
+	    			}
+	    		  }).start(); 
 	    		  return true;
 	    	  }
 	    	  case MENU_QUOTE: {	    		 	    		 
