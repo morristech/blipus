@@ -33,7 +33,7 @@ public class MsgView extends LinearLayout {
 		TextView msgUser = (TextView)findViewById(R.id.msgUser);
 		TextView msgBody = (TextView)findViewById(R.id.msgBody);		
 		msgUser.setText(users);
-		msgBody.setText(messageBody);
+		msgBody.setText(messageBody+"\n");
 		Linkify.addLinks(msgBody, Linkify.ALL);		
 		Linkify.addLinks(msgBody, Pattern.compile("[\\#\\^]\\w+"),  "http://blip.pl/", matcher, filter);		
 	}

@@ -1,6 +1,12 @@
 package pl.przemelek.android;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -8,15 +14,23 @@ import java.util.List;
 import pl.przemelek.android.blip.Blip;
 import pl.przemelek.android.blip.Credentials;
 import pl.przemelek.android.blip.Blip.BlipMsg;
+import pl.przemelek.android.camera.CameraPreview;
 import pl.przemelek.android.db.StatusesManager;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.NotificationManager;
 import android.app.Service;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.provider.MediaStore.Images;
+import android.provider.MediaStore.Images.Media;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.ContextMenu;
@@ -54,6 +68,7 @@ public class Blipus extends Activity {
 	private ListView list;
 	private Blip blip;
 	private StatusesManager manager;
+	private File file;
 	/** Called when the activity is first created. */ 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -79,6 +94,7 @@ public class Blipus extends Activity {
         }        
         currentUserName = userName;
         Button button = (Button)findViewById(R.id.Button01);
+        Button button2 = (Button)findViewById(R.id.Button02);
         final EditText editor = (EditText)findViewById(R.id.Edit01);
         final TextView textLengthInfo = (TextView)findViewById(R.id.textSize);
         list = (ListView)findViewById(R.id.list);
@@ -161,7 +177,132 @@ public class Blipus extends Activity {
             	  d.show();
               }
         	}
-        });        
+        });
+        button2.setOnClickListener(new OnClickListener() {
+        	public void onClick(View v) {
+//        		startActivity(new Intent(Blipus.this,CameraPreview.class));
+        		
+//        		Intent pickPhotoFromCameraIntent = new Intent("android.media.action.IMAGE_CAPTURE");
+//        		pickPhotoFromCameraIntent.putExtra("EXTRA_OUTPUT","output");
+//        		startActivityForResult(pickPhotoFromCameraIntent, 2);
+        		
+//        		startActivity(new Intent("com.android.camera"));
+        		//com.android.camera
+        		
+        		Uri mUri = null;
+        		try {
+        			file = File.createTempFile(""+System.currentTimeMillis(), "jpg");
+        			file.deleteOnExit();
+        			mUri = Uri.fromFile(file);
+        		} catch (Exception e) {
+            		ContentValues values = new ContentValues();
+            		values.put(Media.TITLE, "Image");
+            		values.put(Images.Media.BUCKET_ID, "test");
+            		values.put(Media.DESCRIPTION, "Image capture by camera");
+            		mUri = getContentResolver().insert(Media.EXTERNAL_CONTENT_URI, values);
+        		}
+        		Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        		i.putExtra(MediaStore.EXTRA_OUTPUT, mUri);
+        		startActivityForResult(i, 1);
+        	}
+        });
+    }
+    
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    	if (requestCode==1) {
+	    	final EditText editor = (EditText)findViewById(R.id.Edit01);
+	    	byte[] b = new byte[1024];
+	    	int rv = 0;
+	    	super.onActivityResult(requestCode, resultCode, data);
+	    	ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	    	try {
+//		    	InputStream in = getContentResolver().openInputStream(mUri);
+	    		
+	    		InputStream is = new FileInputStream(file);
+		    	
+		    	while ((rv=is.read(b))>0) {
+		    		baos.write(b, 0, rv);
+		    	}
+		    	
+		    	is.close();
+		    	file.delete();
+	    	
+	    	} catch (Exception e) {
+	    		 try {
+	       		   FileWriter fw = new FileWriter("/sdcard/logPrzemelekException_.txt");
+	       		   PrintWriter pw = new PrintWriter(fw);
+	       		   e.printStackTrace(pw);
+	       		   fw.close();
+	       	   } catch (Exception ex) { }
+	        	  Dialog d = new Dialog(editor.getContext());
+	        	  d.setTitle(e.getMessage()+"\n"+e.getLocalizedMessage());
+	        	  d.show();
+	    	}
+	    	
+	          
+	 	   try {
+	 		   FileWriter fw = new FileWriter("/sdcard/logPrzemelek.txt");
+	 		   PrintWriter pw = new PrintWriter(fw);
+	 		   for (String key:data.getExtras().keySet()) {
+	 			   pw.println(key);
+	 		   }
+	 		   fw.close();
+	 	   } catch (Exception ex) { }
+	                
+	        String text = editor.getText().toString();
+	        try {
+	      	  text = text.replaceAll("\n", " ").trim();
+	      	  blip.sendBlip(text,baos.toByteArray());
+	      	  baos.close();
+	      	  editor.setText("");
+	      	  refreshListOfBlips(list);
+	        } catch (Exception e) {
+	     	   try {
+	     		   FileWriter fw = new FileWriter("/sdcard/logPrzemelekException.txt");
+	     		   PrintWriter pw = new PrintWriter(fw);
+	     		   e.printStackTrace(pw);
+	     		   fw.close();
+	     	   } catch (Exception ex) { }
+	      	  Dialog d = new Dialog(editor.getContext());
+	      	  d.setTitle(e.getMessage()+"\n"+e.getLocalizedMessage());
+	      	  d.show();
+	        }
+    	}
+//       if ( data != null && data.hasExtra("data") ) {           
+//    	   try {
+//    		   FileWriter fw = new FileWriter("/sdcard/logPrzemelek.txt");
+//    		   PrintWriter pw = new PrintWriter(fw);
+//    		   for (String key:data.getExtras().keySet()) {
+//    			   pw.println(key);
+//    		   }
+//    		   fw.close();
+//    	   } catch (Exception ex) { }
+//           
+//    	   Bitmap photo = (Bitmap)data.getParcelableExtra("data");
+//    	   
+//           ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//           photo.compress(CompressFormat.JPEG, 80, baos);
+//           final EditText editor = (EditText)findViewById(R.id.Edit01);
+//           String text = editor.getText().toString();
+//           try {
+//         	  text = text.replaceAll("\n", " ").trim();
+//         	  blip.sendBlip(text,baos.toByteArray());
+//         	  baos.close();
+//         	  editor.setText("");
+//         	  refreshListOfBlips(list);
+//           } catch (Exception e) {
+//        	   try {
+//        		   FileWriter fw = new FileWriter("/sdcard/logPrzemelek.txt");
+//        		   PrintWriter pw = new PrintWriter(fw);
+//        		   e.printStackTrace(pw);
+//        		   fw.close();
+//        	   } catch (Exception ex) { }
+//         	  Dialog d = new Dialog(editor.getContext());
+//         	  d.setTitle(e.getMessage()+"\n"+e.getLocalizedMessage());
+//         	  d.show();
+//           }
+//           
+//       }
     }
     
 	private void refreshListOfBlips(final ListView list) {

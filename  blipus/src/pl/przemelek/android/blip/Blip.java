@@ -174,10 +174,10 @@ public class Blip {
 		this.credentials = credentials;
 	}
 	
-	public String sendBlip(String text) throws IOException {		
-		HttpURLConnection connection = getConnection("http://api.blip.pl/updates");
-		connection.setRequestMethod("POST");
+	public String sendBlip(String text) throws IOException {
 		byte[] bytes = ("update[body]="+text).getBytes();
+		HttpURLConnection connection = getConnection("http://api.blip.pl/updates");
+		connection.setRequestMethod("POST");		
 		connection.setRequestProperty("Content-Length", ""+bytes.length);
 		connection.setDoOutput(true);
 		connection.connect();		
@@ -191,6 +191,42 @@ public class Blip {
 		br.close();
 		return str;
 	}
+	
+	public String sendBlip(String text,byte[] buffer) throws IOException {
+		byte[] bytes = ("update[body]="+text).getBytes();
+		HttpURLConnection connection = getConnection("http://api.blip.pl/updates");
+//		connection.setRequestMethod("POST");
+	    String boundary = "AaB03x";
+	    connection.setRequestProperty("Content-Type", "multipart/form-data; boundary="+boundary);
+	    connection.setRequestMethod("POST");
+//		connection.setRequestProperty("Content-Length", ""+(bytes.length);
+
+		connection.setDoOutput(true);
+		connection.connect();
+
+		connection.getOutputStream().write(("--"+boundary+"\r\n").getBytes());
+		connection.getOutputStream().write(("Content-Disposition: form-data; name=\"update[body]\"\r\n").getBytes());
+		connection.getOutputStream().write(("Content-Type: text/plain\r\n").getBytes());
+		connection.getOutputStream().write(("\r\n").getBytes());
+		connection.getOutputStream().write((text+"\r\n").getBytes());
+		
+	    connection.getOutputStream().write(("--"+boundary+"\r\n").getBytes());
+	    connection.getOutputStream().write(("Content-Disposition: form-data; name=\"update[picture]\"; filename=\"pictur.jpg\"\r\n").getBytes());
+	    connection.getOutputStream().write(("Content-Type: image/jpeg\r\n").getBytes());
+	    connection.getOutputStream().write(("\r\n").getBytes());
+	    connection.getOutputStream().write(buffer);
+	    connection.getOutputStream().write(("\r\n--"+boundary+"--\r\n").getBytes());
+	    connection.getOutputStream().flush();
+	    connection.getOutputStream().close();
+		BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+		String line = null;
+		String str = "";
+		while ((line=br.readLine())!=null) {
+		  str+=line+"\n";
+		}  	  
+		br.close();
+		return str;
+	}	
 	
 	public String deleteBlip(String id) throws IOException {		
 		HttpURLConnection connection = getConnection("http://api.blip.pl/updates/"+id);

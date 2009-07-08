@@ -36,7 +36,9 @@ public class BlipusService extends Service {
 		updateTimer = new Timer("blipusTimer");
 		TimerTask doRefresh = new TimerTask() {
 			public void run() {
-				refreshListOfBlips();
+				try {
+					refreshListOfBlips();
+				} catch (Exception e) { }
 			}
 		};		
 		updateTimer.scheduleAtFixedRate(doRefresh, 0, 10*1000);
