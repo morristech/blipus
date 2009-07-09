@@ -68,7 +68,7 @@ public class Blipus extends Activity {
 	private ListView list;
 	private Blip blip;
 	private StatusesManager manager;
-	private File file;
+	private Uri mUri;
 	/** Called when the activity is first created. */ 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -189,47 +189,46 @@ public class Blipus extends Activity {
 //        		startActivity(new Intent("com.android.camera"));
         		//com.android.camera
         		
-        		Uri mUri = null;
+        		mUri = null;
         		try {
-        			file = File.createTempFile(""+System.currentTimeMillis(), "jpg");
-        			file.deleteOnExit();
-        			mUri = Uri.fromFile(file);
-        		} catch (Exception e) {
             		ContentValues values = new ContentValues();
             		values.put(Media.TITLE, "Image");
             		values.put(Images.Media.BUCKET_ID, "test");
             		values.put(Media.DESCRIPTION, "Image capture by camera");
             		mUri = getContentResolver().insert(Media.EXTERNAL_CONTENT_URI, values);
+            		Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            		i.putExtra(MediaStore.EXTRA_OUTPUT, mUri);
+            		startActivityForResult(i, 1);
+        		} catch (Exception e) {
+        			try {
+	 	       		   FileWriter fw = new FileWriter("/sdcard/"+System.currentTimeMillis()+".txt");
+		       		   PrintWriter pw = new PrintWriter(fw);
+		       		   e.printStackTrace(pw);
+		       		   fw.close();
+        			} catch (Exception ex) {
+        				
+        			}
         		}
-        		Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        		i.putExtra(MediaStore.EXTRA_OUTPUT, mUri);
-        		startActivityForResult(i, 1);
         	}
         });
     }
     
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    	if (requestCode==1) {
+    	if (resultCode==Activity.RESULT_OK) {
 	    	final EditText editor = (EditText)findViewById(R.id.Edit01);
 	    	byte[] b = new byte[1024];
 	    	int rv = 0;
 	    	super.onActivityResult(requestCode, resultCode, data);
 	    	ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	    	try {
-//		    	InputStream in = getContentResolver().openInputStream(mUri);
-	    		
-	    		InputStream is = new FileInputStream(file);
-		    	
+		    	InputStream is = getContentResolver().openInputStream(mUri);	    		
 		    	while ((rv=is.read(b))>0) {
 		    		baos.write(b, 0, rv);
-		    	}
-		    	
+		    	}		    	
 		    	is.close();
-		    	file.delete();
-	    	
 	    	} catch (Exception e) {
 	    		 try {
-	       		   FileWriter fw = new FileWriter("/sdcard/logPrzemelekException_.txt");
+	       		   FileWriter fw = new FileWriter("/sdcard/"+System.currentTimeMillis()+".txt");
 	       		   PrintWriter pw = new PrintWriter(fw);
 	       		   e.printStackTrace(pw);
 	       		   fw.close();
@@ -238,10 +237,8 @@ public class Blipus extends Activity {
 	        	  d.setTitle(e.getMessage()+"\n"+e.getLocalizedMessage());
 	        	  d.show();
 	    	}
-	    	
-	          
 	 	   try {
-	 		   FileWriter fw = new FileWriter("/sdcard/logPrzemelek.txt");
+	 		   FileWriter fw = new FileWriter("/sdcard/"+System.currentTimeMillis()+".txt");
 	 		   PrintWriter pw = new PrintWriter(fw);
 	 		   for (String key:data.getExtras().keySet()) {
 	 			   pw.println(key);
@@ -258,7 +255,7 @@ public class Blipus extends Activity {
 	      	  refreshListOfBlips(list);
 	        } catch (Exception e) {
 	     	   try {
-	     		   FileWriter fw = new FileWriter("/sdcard/logPrzemelekException.txt");
+	     		   FileWriter fw = new FileWriter("/sdcard/"+System.currentTimeMillis()+".txt");
 	     		   PrintWriter pw = new PrintWriter(fw);
 	     		   e.printStackTrace(pw);
 	     		   fw.close();
