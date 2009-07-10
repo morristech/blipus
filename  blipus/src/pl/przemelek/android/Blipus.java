@@ -192,9 +192,9 @@ public class Blipus extends Activity {
         		mUri = null;
         		try {
             		ContentValues values = new ContentValues();
-            		values.put(Media.TITLE, "Image");
+            		values.put(Media.TITLE, "Image.jpg");
             		values.put(Images.Media.BUCKET_ID, "test");
-            		values.put(Media.DESCRIPTION, "Image capture by camera");
+            		values.put(Media.DESCRIPTION, "Image captured by camera");
             		mUri = getContentResolver().insert(Media.EXTERNAL_CONTENT_URI, values);
             		Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             		i.putExtra(MediaStore.EXTRA_OUTPUT, mUri);
@@ -221,11 +221,12 @@ public class Blipus extends Activity {
 	    	super.onActivityResult(requestCode, resultCode, data);
 	    	ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	    	try {
-		    	InputStream is = getContentResolver().openInputStream(mUri);	    		
+		    	InputStream is = getContentResolver().openInputStream(mUri);
 		    	while ((rv=is.read(b))>0) {
 		    		baos.write(b, 0, rv);
 		    	}		    	
 		    	is.close();
+		    	getContentResolver().delete(mUri, null, null);
 	    	} catch (Exception e) {
 	    		 try {
 	       		   FileWriter fw = new FileWriter("/sdcard/"+System.currentTimeMillis()+".txt");
