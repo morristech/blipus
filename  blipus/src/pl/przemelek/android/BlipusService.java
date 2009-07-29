@@ -72,9 +72,9 @@ public class BlipusService extends Service {
 		        		}		        	
 				        NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);			        
 				        Notification notification = new Notification(R.drawable.icon,"New blips!!!",System.currentTimeMillis());
-	//			        notification.flags=Notification.FLAG_SHOW_LIGHTS;
-	//			        notification.ledOffMS=100;
-	//			        notification.ledOnMS=250;
+				        notification.flags=Notification.FLAG_SHOW_LIGHTS;
+				        notification.ledOffMS=100;
+				        notification.ledOnMS=250;
 				        
 				        Context context = getApplicationContext();
 				        String expandedText = "You have "+blips.size()+" new blips";
@@ -86,8 +86,9 @@ public class BlipusService extends Service {
 				    		 expandedText,
 				    		 launchIntent);
 				        
-				        nm.notify(1, notification);
-		        	}
+				        nm.notify(1, notification);				        
+		        	}		        	
+		        	manager.keepOnlyLatest(50);
 		        } catch (final Exception e) {		        	
 		        	e.printStackTrace();	            	  
 		        } finally {

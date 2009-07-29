@@ -34,17 +34,17 @@
     android:gravity="right" 
     android:layout_gravity="fill_horizontal" 
     android:fitsSystemWindows="true">	
-<ImageView android:id="@+id/image"
+<ImageView android:id="@+id/imageIcon"
 	android:visibility="invisible"
 	android:background="@drawable/image"
 	android:layout_width="wrap_content" 
 	android:layout_height="wrap_content"/>
-<ImageView android:id="@+id/movie"
+<ImageView android:id="@+id/movieIcon"
 	android:visibility="invisible"
 	android:background="@drawable/movie" 
 	android:layout_width="wrap_content" 
 	android:layout_height="wrap_content"/>
-<ImageView android:id="@+id/recording"
+<ImageView android:id="@+id/recordingIcon"
 	android:visibility="invisible"
 	android:background="@drawable/recording" 
 	android:layout_width="wrap_content" 
@@ -52,7 +52,7 @@
 </LinearLayout>	
 </LinearLayout>
 <TextView android:id="@+id/msgBody" 
-	android:text="blipView" 
+	android:text="blipView"
 	android:textColor="@android:color/black"
 	android:background="@android:color/white"
 	android:textColorHighlight="@color/blue2"

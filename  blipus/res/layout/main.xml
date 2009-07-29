@@ -6,7 +6,26 @@
     >
 <TextView android:textSize="10px" android:background="@android:color/black" android:layout_height="wrap_content" android:lines="1" android:id="@+id/textSize" android:text="0/160" android:textColor="#AAA" android:gravity="right" android:layout_width="fill_parent"/>
 <EditText android:layout_height="wrap_content" android:layout_width="fill_parent" android:lines="3" android:id="@+id/Edit01"></EditText>
-<Button android:id="@+id/Button01" android:layout_height="wrap_content" android:text="Blip" android:layout_width="fill_parent"></Button>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+
+        
+<Button android:id="@+id/Button01" android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textSize"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="10dip"
+        android:width="250px"
+	    android:text="Blip"></Button>	  
+<Button android:id="@+id/Button02"  android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="1dip"
+        android:layout_toLeftOf="@id/Button01"
+        android:layout_alignTop="@id/Button01"
+        android:width="40px" android:height="40px" android:background="@drawable/image"
+         ></Button>        
+</RelativeLayout>
 <ListView android:id="@+id/list" 
 		android:background="@android:color/white" 
 		android:layout_width="fill_parent" 

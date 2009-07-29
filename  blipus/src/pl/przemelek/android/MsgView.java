@@ -8,6 +8,7 @@ import android.text.util.Linkify;
 import android.text.util.Linkify.MatchFilter;
 import android.text.util.Linkify.TransformFilter;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -26,7 +27,7 @@ public class MsgView extends LinearLayout {
 			return true;
 		};
 	};
-	public MsgView(Context context, String users, String messageBody) {
+	public MsgView(Context context, String users, String messageBody, boolean imageIconVisible, boolean movieIconVisible, boolean recordingIconVisible) {
 		super(context);
 		LayoutInflater li = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		li.inflate(R.layout.msg_view, this, true);
@@ -35,7 +36,10 @@ public class MsgView extends LinearLayout {
 		msgUser.setText(users);
 		msgBody.setText(messageBody+"\n");
 		Linkify.addLinks(msgBody, Linkify.ALL);		
-		Linkify.addLinks(msgBody, Pattern.compile("[\\#\\^]\\w+"),  "http://blip.pl/", matcher, filter);		
+		Linkify.addLinks(msgBody, Pattern.compile("[\\#\\^]\\w+"),  "http://blip.pl/", matcher, filter);
+  	  	findViewById(R.id.imageIcon).setVisibility(imageIconVisible?View.VISIBLE:View.INVISIBLE);
+  	  	findViewById(R.id.movieIcon).setVisibility(movieIconVisible?View.VISIBLE:View.INVISIBLE);
+  	  	findViewById(R.id.recordingIcon).setVisibility(recordingIconVisible?View.VISIBLE:View.INVISIBLE);
 	}
 	
 

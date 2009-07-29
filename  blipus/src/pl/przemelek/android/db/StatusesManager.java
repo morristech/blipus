@@ -108,6 +108,23 @@ public class StatusesManager {
 		return list;
 	}
 	
+	public void deleteOrderThen(String condition) {
+		List<BlipMsg> list = getList("", null, true);
+		for (BlipMsg msg:list) {
+			if (msg.getCreatedAt().compareTo(condition)<0) {
+				delete(msg);
+			}
+		}
+	}
+	
+	public void keepOnlyLatest(int max) {
+		List<BlipMsg> list = getList("", null, true);
+		int size = list.size()-50;
+		for (int i=0; i<size; i++) {
+			delete(list.get(i));
+		}
+	}
+	
 	public int getMaxID() {
 		List<BlipMsg> list = getList("","1",false);
 		if (list.size()<1) return -1;

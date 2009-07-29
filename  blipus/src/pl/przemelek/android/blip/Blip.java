@@ -174,6 +174,10 @@ public class Blip {
 		this.credentials = credentials;
 	}
 	
+	public Blip() {
+		this.credentials = null;
+	}
+	
 	public String sendBlip(String text) throws IOException {
 		byte[] bytes = ("update[body]="+text).getBytes();
 		HttpURLConnection connection = getConnection("http://api.blip.pl/updates");
@@ -248,23 +252,20 @@ public class Blip {
 	}
 	
 	public List<BlipMsg> getBlips(String condition) throws MalformedURLException, IOException {
+		return getBlips("",condition);
+	}
+	
+	public List<BlipMsg> getBlips(String userString, String condition) throws MalformedURLException, IOException {
 		List<BlipMsg> blips = new ArrayList<BlipMsg>();
-		String url = "http://api.blip.pl/dashboard";
+		String url = "http://api.blip.pl/"+userString+"dashboard";
 		if (condition!=null) {
-			url = "http://api.blip.pl/dashboard/since/"+condition;
+			url = "http://api.blip.pl/"+userString+"dashboard/since/"+condition;
 		}
 		HttpURLConnection connection = getConnection(url);
 		connection.setRequestMethod("GET");
 		connection.setDoInput(true);
 		connection.connect();
-		  ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		  InputStream is = connection.getInputStream();
-		  byte[] buffer = new byte[1024];
-		  int readCount;
-	      while((readCount=is.read(buffer))>0) {
-	        baos.write(buffer, 0, readCount);        
-	      }
-		  String str=new String(baos.toByteArray());		
+		  String str = getStringFromConnection(connection);		
 		  try {
 			JSONArray jsonArray = new JSONArray(str);
 			for (int idx=0; idx<jsonArray.length(); idx++) {
@@ -277,12 +278,34 @@ public class Blip {
 		return blips;
 	}
 
-	private HttpURLConnection getConnection(String urlStr) throws MalformedURLException,
+	public String getStringFromConnection(HttpURLConnection connection)
+			throws IOException {
+		byte[] buffer = getBytesFromConnection(connection);
+		  String str=new String(buffer);
+		return str;
+	}
+
+	public byte[] getBytesFromConnection(HttpURLConnection connection)
+			throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		  InputStream is = connection.getInputStream();
+		  byte[] buffer = new byte[1024];
+		  int readCount;
+	      while((readCount=is.read(buffer))>0) {
+	        baos.write(buffer, 0, readCount);        
+	      }
+	      buffer = baos.toByteArray();
+		return buffer;
+	}
+
+	public HttpURLConnection getConnection(String urlStr) throws MalformedURLException,
 			IOException {
 		URL url = new URL(urlStr);
 		HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-		connection.setRequestProperty("User-Agent", "Blipus 0.3");
-		connection.setRequestProperty("Authorization", credentials.getAuthorizationHeader());
+		connection.setRequestProperty("User-Agent", "Blipus 0.4");
+		if (credentials!=null) {
+			connection.setRequestProperty("Authorization", credentials.getAuthorizationHeader());
+		}
 		connection.setRequestProperty("X-Blip-API","0.02");
 		connection.setRequestProperty("Accept","application/json");
 		return connection;

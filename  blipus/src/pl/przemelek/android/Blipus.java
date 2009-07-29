@@ -59,8 +59,10 @@ public class Blipus extends Activity {
 	private static final int MENU_REPLY_QUOTE = 6;
 	private static final int MENU_PRIV_REPLY = 5;
 	private static final int MENU_PRIV_REPLY_QUOTE = 7;
+	private static final int MENU_SHOW_USER_DASHBORD = 8;
+	private static final int MENU_SHOW_IMAGE = 9;
 	private static final int MENU_LINKS = 100;
-	private static final int BLIP_LIMIT = 160;
+	private static final int BLIP_LIMIT = 160;	
 	private static String currentUserName;
 	private boolean duringRefresh = false;
 	private int lastId = -1;
@@ -68,7 +70,8 @@ public class Blipus extends Activity {
 	private ListView list;
 	private Blip blip;
 	private StatusesManager manager;
-	private Uri mUri;
+	private static Uri mUri;
+	private static boolean withPhoto = false;
 	/** Called when the activity is first created. */ 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -105,19 +108,7 @@ public class Blipus extends Activity {
         			ViewGroup parent) {
     	  	  	BlipMsg[] msges = allBlips.toArray(new BlipMsg[allBlips.size()]);
     	  	  	BlipMsg msg = msges[(int)position];
-    	  	  	MsgView view = new MsgView(Blipus.this, msg.getUsersString()+" "+msg.getCreatedAt(), msg.getBody());
-//    	  	  	findViewById(R.id.image).setVisibility(View.INVISIBLE);
-//    	  	  	findViewById(R.id.movie).setVisibility(View.INVISIBLE);
-//    	  	  	findViewById(R.id.recording).setVisibility(View.INVISIBLE);
-//    	  	  	if (msg.hasPicture()) {
-//    	  	  		findViewById(R.id.image).setVisibility(View.VISIBLE);
-//    	  	  	}
-//    	  	  	if (msg.hasMovie()) {
-//    	  	  		findViewById(R.id.movie).setVisibility(View.VISIBLE);
-//    	  	  	}
-//    	  	  	if (msg.hasRecording()) {
-//    	  	  		findViewById(R.id.recording).setVisibility(View.VISIBLE);
-//    	  	  	}    	  	  	
+    	  	  	MsgView view = new MsgView(Blipus.this, msg.getUsersString()+" "+msg.getCreatedAt(), msg.getBody(),msg.hasPicture(),msg.hasMovie(),msg.hasRecording());
         		return view;
         	}
         });        
@@ -168,7 +159,37 @@ public class Blipus extends Activity {
               String text = editor.getText().toString();
               try {
             	  text = text.replaceAll("\n", " ").trim();
-            	  blip.sendBlip(text);
+            	  if (withPhoto) {
+          	    	byte[] b = new byte[1024];
+          	    	int rv = 0;
+          	    	//super.onActivityResult(requestCode, resultCode, data);
+          	    	ByteArrayOutputStream baos = new ByteArrayOutputStream();
+          	    	try {
+          		    	InputStream is = getContentResolver().openInputStream(mUri);
+          		    	while ((rv=is.read(b))>0) {
+          		    		baos.write(b, 0, rv);
+          		    	}		    	
+          		    	is.close();
+          		    	getContentResolver().delete(mUri, null, null);
+          	    	} catch (Exception e) {
+          	    		 try {
+          	       		   FileWriter fw = new FileWriter("/sdcard/"+System.currentTimeMillis()+".txt");
+          	       		   PrintWriter pw = new PrintWriter(fw);
+          	       		   e.printStackTrace(pw);
+           	        	  Dialog d = new Dialog(editor.getContext());
+          	        	  d.setTitle(e.getMessage()+"\n"+e.getLocalizedMessage());
+          	        	  d.show();
+          	       		   fw.close();
+          	       	   } catch (Exception ex) { }
+          	        	  Dialog d = new Dialog(editor.getContext());
+          	        	  d.setTitle(e.getMessage()+"\n"+e.getLocalizedMessage());
+          	        	  d.show();
+          	    	}
+          	    	blip.sendBlip(text, baos.toByteArray());
+            	  } else {            	  
+            		blip.sendBlip(text);
+            	  }
+            	  withPhoto = false;
             	  editor.setText("");
             	  refreshListOfBlips(list);
               } catch (Exception e) {              
@@ -215,56 +236,60 @@ public class Blipus extends Activity {
     
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     	if (resultCode==Activity.RESULT_OK) {
-	    	final EditText editor = (EditText)findViewById(R.id.Edit01);
-	    	byte[] b = new byte[1024];
-	    	int rv = 0;
-	    	super.onActivityResult(requestCode, resultCode, data);
-	    	ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	    	try {
-		    	InputStream is = getContentResolver().openInputStream(mUri);
-		    	while ((rv=is.read(b))>0) {
-		    		baos.write(b, 0, rv);
-		    	}		    	
-		    	is.close();
-		    	getContentResolver().delete(mUri, null, null);
-	    	} catch (Exception e) {
-	    		 try {
-	       		   FileWriter fw = new FileWriter("/sdcard/"+System.currentTimeMillis()+".txt");
-	       		   PrintWriter pw = new PrintWriter(fw);
-	       		   e.printStackTrace(pw);
-	       		   fw.close();
-	       	   } catch (Exception ex) { }
-	        	  Dialog d = new Dialog(editor.getContext());
-	        	  d.setTitle(e.getMessage()+"\n"+e.getLocalizedMessage());
-	        	  d.show();
-	    	}
-	 	   try {
-	 		   FileWriter fw = new FileWriter("/sdcard/"+System.currentTimeMillis()+".txt");
-	 		   PrintWriter pw = new PrintWriter(fw);
-	 		   for (String key:data.getExtras().keySet()) {
-	 			   pw.println(key);
-	 		   }
-	 		   fw.close();
-	 	   } catch (Exception ex) { }
-	                
-	        String text = editor.getText().toString();
-	        try {
-	      	  text = text.replaceAll("\n", " ").trim();
-	      	  blip.sendBlip(text,baos.toByteArray());
-	      	  baos.close();
-	      	  editor.setText("");
-	      	  refreshListOfBlips(list);
-	        } catch (Exception e) {
-	     	   try {
-	     		   FileWriter fw = new FileWriter("/sdcard/"+System.currentTimeMillis()+".txt");
-	     		   PrintWriter pw = new PrintWriter(fw);
-	     		   e.printStackTrace(pw);
-	     		   fw.close();
-	     	   } catch (Exception ex) { }
-	      	  Dialog d = new Dialog(editor.getContext());
-	      	  d.setTitle(e.getMessage()+"\n"+e.getLocalizedMessage());
-	      	  d.show();
-	        }
+    		Button button = (Button)findViewById(R.id.Button01);
+    		button.setText("Blip with photo");
+    		withPhoto = true;
+    		super.onActivityResult(requestCode, resultCode, data);
+//	    	final EditText editor = (EditText)findViewById(R.id.Edit01);
+//	    	byte[] b = new byte[1024];
+//	    	int rv = 0;
+//	    	super.onActivityResult(requestCode, resultCode, data);
+//	    	ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//	    	try {
+//		    	InputStream is = getContentResolver().openInputStream(mUri);
+//		    	while ((rv=is.read(b))>0) {
+//		    		baos.write(b, 0, rv);
+//		    	}		    	
+//		    	is.close();
+//		    	getContentResolver().delete(mUri, null, null);
+//	    	} catch (Exception e) {
+//	    		 try {
+//	       		   FileWriter fw = new FileWriter("/sdcard/"+System.currentTimeMillis()+".txt");
+//	       		   PrintWriter pw = new PrintWriter(fw);
+//	       		   e.printStackTrace(pw);
+//	       		   fw.close();
+//	       	   } catch (Exception ex) { }
+//	        	  Dialog d = new Dialog(editor.getContext());
+//	        	  d.setTitle(e.getMessage()+"\n"+e.getLocalizedMessage());
+//	        	  d.show();
+//	    	}
+//	 	   try {
+//	 		   FileWriter fw = new FileWriter("/sdcard/"+System.currentTimeMillis()+".txt");
+//	 		   PrintWriter pw = new PrintWriter(fw);
+//	 		   for (String key:data.getExtras().keySet()) {
+//	 			   pw.println(key);
+//	 		   }
+//	 		   fw.close();
+//	 	   } catch (Exception ex) { }
+//	                
+//	        String text = editor.getText().toString();
+//	        try {
+//	      	  text = text.replaceAll("\n", " ").trim();
+//	      	  blip.sendBlip(text,baos.toByteArray());
+//	      	  baos.close();
+//	      	  editor.setText("");
+//	      	  refreshListOfBlips(list);
+//	        } catch (Exception e) {
+//	     	   try {
+//	     		   FileWriter fw = new FileWriter("/sdcard/"+System.currentTimeMillis()+".txt");
+//	     		   PrintWriter pw = new PrintWriter(fw);
+//	     		   e.printStackTrace(pw);
+//	     		   fw.close();
+//	     	   } catch (Exception ex) { }
+//	      	  Dialog d = new Dialog(editor.getContext());
+//	      	  d.setTitle(e.getMessage()+"\n"+e.getLocalizedMessage());
+//	      	  d.show();
+//	        }
     	}
 //       if ( data != null && data.hasExtra("data") ) {           
 //    	   try {
@@ -405,9 +430,13 @@ public class Blipus extends Activity {
 	    	menu.setHeaderTitle(getString(R.string.manageYourBlips));
 	    	String user = msg.getUserPath();
   		  	user = user.substring(user.lastIndexOf("/")+1);
+  		  	menu.add(0,MENU_SHOW_USER_DASHBORD,0,"Show "+user+" dashboard");
+  		  	if (msg.hasPicture()) {
+  		  		menu.add(0,MENU_SHOW_IMAGE,0,"Show image");
+  		  	}
 	    	if (currentUserName.equals(user)) {
 	    		menu.add(0,MENU_DELETE,0,getString(R.string.delete));
-	    	}
+	    	}	    	
 	    	menu.add(0,MENU_QUOTE,0,getString(R.string.Quote));
 	    	menu.add(0,MENU_REPLY,0,getString(R.string.Reply));
 	    	menu.add(0,MENU_REPLY_QUOTE,0,getString(R.string.ReplyAndQuote));
@@ -473,6 +502,21 @@ public class Blipus extends Activity {
 	    		  return true;
 	    	  }
 	    	  case MENU_LINKS: {
+	    		  return true;
+	    	  }
+	    	  case MENU_SHOW_USER_DASHBORD: {
+	    		  String user = msg.getUserPath();
+	    		  user = user.substring(user.lastIndexOf("/")+1);
+	    		  Intent intent = new Intent(this,Dashboard.class);
+	    		  intent.putExtra("pl.przemelek.android.userName", user);
+	    		  startActivity(intent);
+	    		  return true;
+	    	  }
+	    	  case MENU_SHOW_IMAGE: {
+	    		  String picturePath = msg.getPicturesPath();
+	    		  Intent intent = new Intent(this,ImageViewer.class);
+	    		  intent.putExtra("pl.przemelek.android.imegInfoURL", picturePath);
+	    		  startActivity(intent);
 	    		  return true;
 	    	  }
     	  }

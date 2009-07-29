@@ -8,6 +8,9 @@
 <EditText android:id="@+id/loginTextField" android:layout_height="wrap_content" android:layout_width="fill_parent"></EditText>
 <TextView android:id="@+id/TextView02" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/Password"></TextView>
 <EditText android:id="@+id/passwordTextField" android:layout_height="wrap_content" android:layout_width="fill_parent" android:password="true"></EditText>
+<TextView android:id="@+id/TextView03" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/Interval"></TextView>
+<EditText android:id="@+id/minutes" android:layout_height="wrap_content" android:layout_width="fill_parent" android:numeric="integer"></EditText>
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
