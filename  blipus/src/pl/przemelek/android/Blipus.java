@@ -155,48 +155,52 @@ public class Blipus extends Activity {
         }).start();        
         
         button.setOnClickListener(new OnClickListener() {
-        	public void onClick(View v) {              
-              String text = editor.getText().toString();
-              try {
-            	  text = text.replaceAll("\n", " ").trim();
-            	  if (withPhoto) {
-          	    	byte[] b = new byte[1024];
-          	    	int rv = 0;
-          	    	//super.onActivityResult(requestCode, resultCode, data);
-          	    	ByteArrayOutputStream baos = new ByteArrayOutputStream();
-          	    	try {
-          		    	InputStream is = getContentResolver().openInputStream(mUri);
-          		    	while ((rv=is.read(b))>0) {
-          		    		baos.write(b, 0, rv);
-          		    	}		    	
-          		    	is.close();
-          		    	getContentResolver().delete(mUri, null, null);
-          	    	} catch (Exception e) {
-          	    		 try {
-          	       		   FileWriter fw = new FileWriter("/sdcard/"+System.currentTimeMillis()+".txt");
-          	       		   PrintWriter pw = new PrintWriter(fw);
-          	       		   e.printStackTrace(pw);
-           	        	  Dialog d = new Dialog(editor.getContext());
-          	        	  d.setTitle(e.getMessage()+"\n"+e.getLocalizedMessage());
-          	        	  d.show();
-          	       		   fw.close();
-          	       	   } catch (Exception ex) { }
-          	        	  Dialog d = new Dialog(editor.getContext());
-          	        	  d.setTitle(e.getMessage()+"\n"+e.getLocalizedMessage());
-          	        	  d.show();
-          	    	}
-          	    	blip.sendBlip(text, baos.toByteArray());
-            	  } else {            	  
-            		blip.sendBlip(text);
-            	  }
-            	  withPhoto = false;
-            	  editor.setText("");
-            	  refreshListOfBlips(list);
-              } catch (Exception e) {              
-            	  Dialog d = new Dialog(editor.getContext());
-            	  d.setTitle(e.getLocalizedMessage());
-            	  d.show();
-              }
+        	public void onClick(View v) {
+        		new Thread(new Runnable() {
+        			public void run() {
+        	              String text = editor.getText().toString();
+        	              try {
+        	            	  text = text.replaceAll("\n", " ").trim();
+        	            	  if (withPhoto) {
+        	          	    	byte[] b = new byte[1024];
+        	          	    	int rv = 0;
+        	          	    	//super.onActivityResult(requestCode, resultCode, data);
+        	          	    	ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        	          	    	try {
+        	          		    	InputStream is = getContentResolver().openInputStream(mUri);
+        	          		    	while ((rv=is.read(b))>0) {
+        	          		    		baos.write(b, 0, rv);
+        	          		    	}		    	
+        	          		    	is.close();
+        	          		    	getContentResolver().delete(mUri, null, null);
+        	          	    	} catch (Exception e) {
+        	          	    		 try {
+        	          	       		   FileWriter fw = new FileWriter("/sdcard/"+System.currentTimeMillis()+".txt");
+        	          	       		   PrintWriter pw = new PrintWriter(fw);
+        	          	       		   e.printStackTrace(pw);
+        	           	        	  Dialog d = new Dialog(editor.getContext());
+        	          	        	  d.setTitle(e.getMessage()+"\n"+e.getLocalizedMessage());
+        	          	        	  d.show();
+        	          	       		   fw.close();
+        	          	       	   } catch (Exception ex) { }
+        	          	        	  Dialog d = new Dialog(editor.getContext());
+        	          	        	  d.setTitle(e.getMessage()+"\n"+e.getLocalizedMessage());
+        	          	        	  d.show();
+        	          	    	}          	    	
+        	          	    	blip.sendBlip(text, baos.toByteArray());
+        	            	  } else {            	  
+        	            		blip.sendBlip(text);
+        	            	  }
+        	            	  withPhoto = false;
+        	            	  editor.setText("");
+        	            	  refreshListOfBlips(list);
+        	              } catch (Exception e) {              
+        	            	  Dialog d = new Dialog(editor.getContext());
+        	            	  d.setTitle(e.getLocalizedMessage());
+        	            	  d.show();
+        	              }        				
+        			}
+        		}).start();
         	}
         });
         button2.setOnClickListener(new OnClickListener() {
